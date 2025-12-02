@@ -1,6 +1,9 @@
 import express from "express";
 import nodemailer from "nodemailer";
 import cors from "cors";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 app.use(express.json());
@@ -15,16 +18,16 @@ app.post("/send-feedback", async (req, res) => {
     port: 587, // TLS port
     secure: false, // Use `true` for port 465
     auth: {
-      user: "xdfeverharsh@gmail.com", // Replace with your Gmail address
-      pass: "oocrunfpoqthrzml", // Replace with your App Password
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
     },
   });
 
   try {
     // Email options
     await transporter.sendMail({
-      from: '"Feedback Form" <xdfeverharsh@gmail.com>',
-      to: "xdfeverharsh@gmail.com",
+      from: `"Feedback Form" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER,
       subject: "New Feedback Received",
       text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
       html: `
