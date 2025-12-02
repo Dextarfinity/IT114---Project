@@ -1,0 +1,475 @@
+<template>
+  <div class="relative w-full h-screen overflow-hidden">
+    <div
+      :class="[
+        'transparency fixed top-5 left-1/2 transform -translate-x-1/2 z-50 p-4 rounded shadow-lg transition-opacity duration-500',
+        toastVisible ? 'opacity-100' : 'opacity-0',
+        toastColor,
+      ]"
+      @transitionend="onTransitionEnd"
+    >
+      <span>{{ toastMessage }}</span>
+    </div>
+    <svg
+      viewBox="0 0 1428 174"
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+    >
+      <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color: #d53369; stop-opacity: 1" />
+          <stop offset="100%" style="stop-color: #daae51; stop-opacity: 1" />
+        </linearGradient>
+      </defs>
+      <!-- Flip the SVG both vertically and horizontally by scaling x and y to -1 -->
+      <g transform="scale(-1, -1) translate(-1428, -174)">
+        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+          <g
+            transform="translate(-2.000000, 44.000000)"
+            fill="url(#gradient)"
+            fill-rule="nonzero"
+          >
+            <path
+              d="M0,0 C90.7283404,0.927527913 147.912752,27.187927 291.910178,59.9119003 C387.908462,81.7278826 543.605069,89.334785 759,82.7326078 C469.336065,156.254352 216.336065,153.6679 0,74.9732496"
+              opacity="0.100000001"
+            ></path>
+            <path
+              d="M100,104.708498 C277.413333,72.2345949 426.147877,52.5246657 546.203633,45.5787101 C666.259389,38.6327546 810.524845,41.7979068 979,55.0741668 C931.069965,56.122511 810.303266,74.8455141 616.699903,111.243176 C423.096539,147.640838 250.863238,145.462612 100,104.708498 Z"
+              opacity="0.100000001"
+            ></path>
+            <path
+              d="M1046,51.6521276 C1130.83045,29.328812 1279.08318,17.607883 1439,40.1656806 L1439,120 C1271.17211,77.9435312 1140.17211,55.1609071 1046,51.6521276 Z"
+              id="Path-4"
+              opacity="0.200000003"
+            ></path>
+          </g>
+          <g
+            transform="translate(-4.000000, 76.000000)"
+            fill="url(#gradient)"
+            fill-rule="nonzero"
+          >
+            <path
+              d="M0.457,34.035 C57.086,53.198 98.208,65.809 123.822,71.865 C181.454,85.495 234.295,90.29 272.033,93.459 C311.355,96.759 396.635,95.801 461.025,91.663 C486.76,90.01 518.727,86.372 556.926,80.752 C595.747,74.596 622.372,70.008 636.799,66.991 C663.913,61.324 712.501,49.503 727.605,46.128 C780.47,34.317 818.839,22.532 856.324,15.904 C922.689,4.169 955.676,2.522 1011.185,0.432 C1060.705,1.477 1097.39,3.129 1121.236,5.387 C1161.703,9.219 1208.621,17.821 1235.4,22.304 C1285.855,30.748 1354.351,47.432 1440.886,72.354 L1441.191,104.352 L1.121,104.031 L0.457,34.035 Z"
+            ></path>
+          </g>
+        </g>
+      </g>
+    </svg>
+
+    <div
+      class="container px-4 sm:px-6 lg:px-8 mx-auto flex flex-wrap flex-col md:flex-row items-center justify-center bg-white authbody min-h-screen py-8"
+    >
+      <!--Left Col-->
+      <div class="w-full md:w-2/5 lg:w-1/2 py-4 md:py-6 text-center hidden md:block">
+        <img class="w-3/4 md:w-4/5 lg:w-full mx-auto z-50" src=".\images\loadingscreen.gif" />
+      </div>
+
+      <!--Right Col-->
+
+      <div
+        id="form-wrapper"
+        class="formwrap w-full max-w-md md:w-3/5 lg:w-1/2 rounded-xl shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 sm:space-y-8 welcome_style"
+      >
+        <div id="form-container" class="from-container">
+          <div id="signup-form" class="form-slide">
+            <h2 class="text-center text-2xl sm:text-3xl md:text-4xl font-extrabold text-black">
+              UPDATE PASSWORD
+            </h2>
+            <p class="text-center text-black text-sm sm:text-base pt-4 sm:pt-6 pb-3 sm:pb-4">
+              Update And Confirm Your New Password:
+            </p>
+            <form @submit.prevent="handleSubmit" class="space-y-4 sm:space-y-6 text-black">
+              <!-- Email Field -->
+              <div class="relative">
+                <input
+                  v-model="email"
+                  placeholder="Email"
+                  class="peer h-10 sm:h-12 w-full border-b-2 border-gray-400 text-sm sm:text-base text-gray-600 bg-gray-50 placeholder-transparent focus:outline-none cursor-not-allowed"
+                  id="email"
+                  name="email"
+                  type="email"
+                  maxlength="50"
+                  readonly
+                  disabled
+                />
+                <label
+                  class="font-bold absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-600 peer-placeholder-shown:top-2"
+                  for="email"
+                  >Email (Auto-filled)</label
+                >
+              </div>
+
+              <!-- Password Field -->
+              <div class="relative">
+                <input
+                  v-model="password"
+                  placeholder="Password"
+                  class="peer h-10 sm:h-12 w-full border-b-2 border-black text-sm sm:text-base text-black bg-transparent placeholder-transparent focus:outline-none focus:border-black"
+                  id="signup-password"
+                  name="signup-password"
+                  type="password"
+                  maxlength="50"
+                  required
+                  @input="validatePassword"
+                />
+                <p id="passwordError" class="text-red-500">
+                  {{ passwordError }}
+                </p>
+                <label
+                  class="font-bold absolute left-0 -top-3.5 text-black text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-black peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-black peer-focus:text-sm"
+                  for="signup-password"
+                  >New Password</label
+                >
+              </div>
+
+              <!-- Confirm Password Field -->
+              <div class="relative">
+                <input
+                  v-model="confirmPassword"
+                  placeholder="Confirm Password"
+                  class="peer h-10 sm:h-12 w-full border-b-2 border-black text-sm sm:text-base text-black bg-transparent placeholder-transparent focus:outline-none focus:border-black"
+                  id="signup-confirm-password"
+                  name="confirm-password"
+                  type="password"
+                  maxlength="50"
+                  required
+                  @input="validateConfirmPassword"
+                />
+                <p id="confirmPasswordError" class="text-red-500">
+                  {{ confirmPasswordError }}
+                </p>
+                <label
+                  class="font-bold absolute left-0 -top-3.5 text-black text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-black peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-black peer-focus:text-sm"
+                  for="signup-confirm-password"
+                  >Confirm Password</label
+                >
+              </div>
+
+              <button
+                class="w-full py-2 sm:py-3 px-4 bg-black hover:bg-gray-800 rounded-md shadow-lg text-white text-sm sm:text-base font-semibold transition duration-200"
+                type="submit"
+              >
+                Update Password
+              </button>
+              <hr class="divider-line" />
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script setup>
+import { supabase } from "../supabaseClient";
+import Navbar from "@/components/body.vue";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+// Toast handling function
+const toastMessage = ref("");
+const toastColor = ref("");
+const toastVisible = ref(false);
+
+const showToast = (message, type) => {
+  toastMessage.value = message;
+  toastColor.value =
+    type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white";
+  toastVisible.value = true;
+  setTimeout(() => {
+    hideToast();
+  }, 3000);
+};
+
+const hideToast = () => {
+  toastVisible.value = false;
+};
+
+const onTransitionEnd = () => {
+  if (!toastVisible.value) {
+    toastMessage.value = "";
+  }
+};
+
+const router = useRouter(); // Use the router instance
+
+// Reactive variables
+const email = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+const emailError = ref("");
+const passwordError = ref("");
+const confirmPasswordError = ref("");
+
+// Auto-fill email from current session
+const loadUserEmail = async () => {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (user && user.email) {
+      email.value = user.email;
+    }
+  } catch (error) {
+    console.error("Error loading user email:", error);
+  }
+};
+
+// Load email on component mount
+loadUserEmail();
+
+// Email validation logic
+const validateEmail = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email.value.trim()) {
+    emailError.value = "Email cannot be empty.";
+  } else if (!emailRegex.test(email.value)) {
+    emailError.value = "Invalid email format.";
+  } else {
+    emailError.value = "";
+  }
+};
+
+// Password validation logic
+const validatePassword = () => {
+  try {
+    if (!password.value.trim()) throw new Error("Empty-password");
+    if (password.value.length < 8) throw new Error("shortPassword");
+    if (!/[A-Z]/.test(password.value)) throw new Error("noUppercase");
+    if (!/[a-z]/.test(password.value)) throw new Error("noLowercase");
+    if (!/[0-9]/.test(password.value)) throw new Error("noDigit");
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password.value))
+      throw new Error("noSpecialCharacter");
+    passwordError.value = "";
+    return true;
+  } catch (error) {
+    passwordError.value = error.message;
+    return false;
+  }
+};
+
+// Confirm password validation
+const validateConfirmPassword = () => {
+  if (confirmPassword.value !== password.value) {
+    confirmPasswordError.value = "Passwords do not match.";
+  } else {
+    confirmPasswordError.value = "";
+  }
+};
+
+// Handle form submission
+const handleSubmit = async () => {
+  validateEmail();
+  const isPasswordValid = validatePassword();
+  validateConfirmPassword();
+
+  if (!emailError.value && isPasswordValid && !confirmPasswordError.value) {
+    try {
+      console.log("Updating password...");
+
+      // Update only the password (email shouldn't be changed during password reset)
+      const { data, error } = await supabase.auth.updateUser({
+        password: password.value,
+      });
+
+      if (error) {
+        console.error("Error updating password:", error.message);
+        showToast(`Error: ${error.message}`, "error");
+      } else {
+        console.log("Password updated successfully:", data);
+        showToast("Password updated successfully! Redirecting to login...", "success");
+        
+        // Sign out the user after password update
+        await supabase.auth.signOut();
+        
+        // Clear form fields
+        email.value = "";
+        password.value = "";
+        confirmPassword.value = "";
+        
+        // Redirect to login after a delay
+        setTimeout(() => {
+          router.push("/auth");
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      showToast("An unexpected error occurred. Please try again.", "error");
+    }
+  } else {
+    console.log("Form contains errors. Please fix them before submitting.");
+    showToast("Please fix the errors before submitting the form.", "error");
+  }
+};
+</script>
+
+<style scoped>
+.authbody {
+  margin-top: -50px;
+}
+
+@media (min-width: 1024px) and (max-width: 1480px) {
+  .authbody {
+    margin-top: -100px;
+  }
+}
+
+.divider-line {
+  width: 100%;
+  border: none;
+  border-top: 1px solid #ccc; /* Adjust color as needed */
+  margin: 10px 0;
+}
+
+svg {
+  position: sticky;
+  top: 0; /* Sticks the element to the top when scrolling */
+  width: 100%; /* Adjust width as needed */
+  height: auto; /* Keeps the aspect ratio */
+  z-index: 10; /* Optional: To ensure it stays on top of other elements */
+}
+.body_sign_in {
+  background-image: linear-gradient(to right, #e2dad6, #363333);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.video-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: -1;
+}
+
+.welcome_style {
+  background-color: rgba(255, 255, 255, 0);
+  background-size: 100% 300px;
+  margin: 0 auto;
+  max-width: 400px;
+  backdrop-filter: blur(10px) !important;
+  color: #000000 !important;
+}
+
+@media (max-width: 768px) {
+  .welcome_style {
+    max-width: 90%;
+  }
+
+  .authbody {
+    margin-top: 0px;
+  }
+
+  h2.text-4xl {
+    font-size: 3rem;
+    /* Increase size for medium screens */
+  }
+  #form-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: calc(100vh - 50px); /* Adjust height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+  }
+  #form-container {
+    height: 650px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome_style {
+    max-width: 95%;
+  }
+
+  h2.text-4xl {
+    font-size: 1.7rem;
+    /* Enlarge "WELCOME" text for mobile screens */
+  }
+  .authbody {
+    margin-top: 0px;
+  }
+  p.text-center.text-black {
+    font-size: 1.2rem;
+    /* Slightly adjust paragraph size */
+  }
+  .buttontext {
+    font-size: 0.7rem;
+  }
+  .authbody {
+    margin-top: -100px;
+    margin-bottom: 200px;
+  }
+  #form-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: calc(100vh - 50px); /* Adjust height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+  }
+  #form-container {
+    height: 650px;
+  }
+}
+
+/* Container for both forms */
+#form-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  /* Increase max-width for larger forms */
+  overflow-x: hidden;
+  padding: 2rem;
+  /* Add padding around the container */
+  background-color: rgba(255, 255, 255, 0);
+  /* Slightly transparent background color */
+  border-radius: 12px;
+  /* Rounded corners */
+  backdrop-filter: blur(10px);
+  /* Apply blur effect to the background */
+}
+
+/* Form container with transition */
+#form-container {
+  display: flex;
+  transition: transform 1s ease-in-out;
+  width: 200%;
+  /* Because two forms are side by side */
+}
+
+/* Individual forms taking 50% width each */
+.form-slide {
+  width: 50%;
+  padding: 2rem;
+  /* Increase padding for larger forms */
+  box-sizing: border-box;
+  /* Ensures padding doesn't affect total width */
+}
+
+/* Hide non-active form */
+.hidden {
+  display: none;
+  /* Hide the form that is not active */
+}
+
+/* Slide to the sign-up form */
+#form-container.signup-active {
+  transform: translateX(-50%);
+}
+.gradient {
+  background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
+}
+
+html,
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+</style>
