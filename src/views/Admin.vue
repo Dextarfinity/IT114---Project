@@ -160,6 +160,7 @@
                             :class="{
                               'text-yellow-500': ride.status === 'Pending',
                               'text-lime-500': ride.status === 'Accepted',
+                              'text-orange-500': ride.status === 'Cancelled',
                               'text-red-500': ride.status === 'Declined',
                             }"
                           >
@@ -200,7 +201,7 @@ export default {
 
 <script setup>
 import { supabase } from "../supabaseClient";
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import {
   Check,
   Ban,
@@ -256,9 +257,11 @@ const fetchAllRecentRides = async () => {
         id,
         created_at,
         status,
+        cancelled_by,
         admin_transactions (from_loc, to_loc)
       `
       )
+      .not("status", "is", null) // Only fetch rides that have been accepted, declined, or cancelled
       .order("created_at", { ascending: false });
 
     if (error) throw new Error(error.message);
@@ -268,10 +271,10 @@ const fetchAllRecentRides = async () => {
       from: transaction.admin_transactions?.from_loc || "N/A",
       to: transaction.admin_transactions?.to_loc || "N/A",
       status:
-        transaction.status === null
-          ? "Pending"
-          : transaction.status === true
+        transaction.status === true
           ? "Accepted"
+          : transaction.cancelled_by === 'user'
+          ? "Cancelled"
           : "Declined",
     }));
     showToast("Recent rides refreshed successfully.", "success");
@@ -306,7 +309,6 @@ const fetchAllRequestingRides = async () => {
       to: transaction.admin_transactions?.to_loc || "N/A",
       status: "Pending",
     }));
-    showToast("Requesting rides refreshed successfully.", "success");
   } catch (err) {
     console.error("Error fetching requesting rides:", err);
     showToast("Failed to load requesting rides. Please try again.", "error");
@@ -327,7 +329,10 @@ const updateAcceptedStatus = async (transactionId, status) => {
   try {
     const { error: updateError } = await supabase
       .from("transactions")
-      .update({ status: status })
+      .update({ 
+        status: status,
+        cancelled_by: status === false ? 'admin' : null 
+      })
       .eq("id", transactionId);
 
     if (updateError) throw new Error(updateError.message);
@@ -363,7 +368,7 @@ const updateAcceptedStatus = async (transactionId, status) => {
     const {
       admin_transactions: { from_loc, to_loc },
       users_transacts: {
-        description_loc,
+        description,
         users_info: { fullname: name, csu_id_number },
       },
     } = transactionDetails;
@@ -373,7 +378,7 @@ const updateAcceptedStatus = async (transactionId, status) => {
       - ID: ${transactionId}
       - From: ${from_loc}
       - To: ${to_loc}
-      - Description: ${description_loc}
+      - Description: ${description}
       - User: ${name} (CSU ID: ${csu_id_number})`
     );
 
@@ -385,9 +390,26 @@ const updateAcceptedStatus = async (transactionId, status) => {
   }
 };
 
-// Fetch rides on component mount
-fetchAllRecentRides();
-fetchAllRequestingRides();
+// Auto-refresh requesting rides every 5 seconds
+let autoRefreshInterval = null;
+
+onMounted(() => {
+  // Initial fetch
+  fetchAllRecentRides();
+  fetchAllRequestingRides();
+
+  // Set up auto-refresh for requesting rides every 5 seconds
+  autoRefreshInterval = setInterval(() => {
+    fetchAllRequestingRides();
+  }, 5000);
+});
+
+onUnmounted(() => {
+  // Clean up the interval when component is unmounted
+  if (autoRefreshInterval) {
+    clearInterval(autoRefreshInterval);
+  }
+});
 </script>
 
 <style scoped>

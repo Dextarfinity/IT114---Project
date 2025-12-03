@@ -104,6 +104,16 @@
         >
           {{ driverStatus }}
         </div>
+
+        <!-- Cancel Button (dynamically shows when in waiting states) -->
+        <div v-if="currentTransactionId && (driverStatus === 'Finding a driver' || driverStatus === 'Waiting Driver to accept...')" class="mt-4">
+          <button
+            @click="cancelBooking"
+            class="px-5 py-3 text-sm font-medium text-white bg-black bg-opacity-40 border border-transparent rounded-lg hover:bg-opacity-60 focus:ring-4 focus:ring-gray-300 transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Cancel Booking
+          </button>
+        </div>
       </div>
     </section>
   </div>
@@ -149,6 +159,7 @@ const locations = [
 ];
 
 const isCallDriverDisabled = ref(false); // Reactive state to track button disable status
+const currentTransactionId = ref(null); // Store the current transaction ID for cancellation
 
 const callDriver = async () => {
   // Check for cooldown before making a request
@@ -274,6 +285,7 @@ const callDriver = async () => {
     }
 
     const transactionId = transactionData[0].id;
+    currentTransactionId.value = transactionId; // Store transaction ID for cancellation
 
     // Step 8: Insert into `admin_dashboard` table
     const { error: adminDashboardError } = await supabase
@@ -432,6 +444,39 @@ const hideToast = () => {
 const onTransitionEnd = () => {
   if (!toastVisible.value) {
     toastMessage.value = "";
+  }
+};
+
+// Cancel booking function
+const cancelBooking = async () => {
+  if (!currentTransactionId.value) {
+    showToast("No active booking to cancel.", "error");
+    return;
+  }
+
+  try {
+    // Update the transaction status to false (cancelled) and mark who cancelled it
+    const { error: updateError } = await supabase
+      .from("transactions")
+      .update({ status: false, cancelled_by: 'user' })
+      .eq("id", currentTransactionId.value);
+
+    if (updateError) {
+      console.error("Error cancelling booking:", updateError.message);
+      showToast("Failed to cancel booking. Please try again.", "error");
+      return;
+    }
+
+    // Update UI
+    terminalLogs.value.push("Booking cancelled by user");
+    driverStatus.value = "Idle";
+    currentTransactionId.value = null;
+    isCallDriverDisabled.value = false;
+    localStorage.removeItem("cooldownEndTime");
+    showToast("Booking cancelled successfully.", "success");
+  } catch (err) {
+    console.error("Unexpected error cancelling booking:", err);
+    showToast("An unexpected error occurred. Please try again.", "error");
   }
 };
 </script>
